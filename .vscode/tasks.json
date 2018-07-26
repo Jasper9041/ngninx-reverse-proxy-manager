@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\Dev-Cpp\\MinGW64\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "nrpm.cpp",
+                "-o",
+                "nrpm.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    }
+}
