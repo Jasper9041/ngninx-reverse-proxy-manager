@@ -6,24 +6,55 @@
 #include "ConfigurationWriter.h"
 
 #include <string>
+#include <algorithm>
+
 using namespace std;
+
+bool isStop(string & str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    return str.compare("stop") == 0;
+}
 
 int main(int argc, char ** argv)
 {
+    string name;
+    cout << "Enter service name: ";
+    getline(cin, name);
 
-//    Destination d("test", 1234);
-//
-//    cout << d.toString();
+    Service service(name);
 
-    Service s("some-service");
-    s.addHostname("some-host.name");
-    s.addHostname("beaurain.servers.name.lol");
-    Destination d("test", 1234);
-    s.addDestination(d);
+    cout << "Enter external hostnames for the service.\nType stop to finish adding hostnames.\n";
+    string hostname;
+    getline(cin, hostname);
+    while(!isStop(hostname))
+    {
+        service.addHostname(hostname);
+        getline(cin, hostname);
+    }
+
+    cout << "Enter upstream hosts for the service.\nType the ip or hostname on one line and the port on the next\nType stop twice to finish adding upstream hosts.\n";
+    string address;
+    string portString;
+    cout << "Enter upstream address:";
+    getline(cin, address);
+    cout << "Enter upstream port:";
+    getline(cin, portString);
+    while( ! isStop(address) && ! isStop(portString))
+    {
+        Destination destination(address, stoi(portString));
+        service.addDestination(destination);
+
+        cout << "Enter upstream address:";
+        getline(cin, address);
+        cout << "Enter upstream port:";
+        getline(cin, portString);
+    }
+
 
     try
     {
-        ConfigurationWriter configurationWriter(s);
+        ConfigurationWriter configurationWriter(service);
         configurationWriter.write();
 
     }
@@ -32,5 +63,5 @@ int main(int argc, char ** argv)
         cout << e.what();
     }
 
-//    cin.get();
+    cout << "File written!";
 };

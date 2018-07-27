@@ -15,18 +15,19 @@ class Service
     private:
         string name;
         vector<string> hostnames;
-        bool enableSsl;
+
         vector<Destination> destinations;
 
     public:
-        Service(string &name);
         Service(string name);
         string getName();
         vector<string> getHostnames();
         void addHostname(string hostname);
         void addDestination(Destination &destination);
         vector<Destination> getDestinations();
-
+        bool acceptsHttp;
+        bool acceptsHttps;
+        string getConfigFileName();
 };
 
 #endif

@@ -9,44 +9,21 @@ using std::string;
 
 void ConfigurationWriter::write()
 {
-    std::ifstream inputStream;
-    inputStream.open(this->templateFileName);
+    vector<string> lines;
 
-    if(! inputStream.is_open())
-    {
-        throw FileOpenException(this->templateFileName);
-    }
+    this->readTemplate(lines);
 
-    string outputFileName = this->service.getName().append(".conf");
-
-    std::ofstream outputStream;
-    outputStream.open(outputFileName);
-
-    if(! outputStream.is_open())
-    {
-        throw FileOpenException(outputFileName);
-    }
-
-    string line;
-
-    while(getline(inputStream, line))
+    for(string & line : lines)
     {
         this->writeName(line);
         this->writeServerNames(line);
         this->writeUpstreams(line);
-
-        outputStream << line << std::endl;
     }
 
-    inputStream.close();
-    outputStream.close();
+    this->writeToOutputFile(lines);
 }
 
-ConfigurationWriter::ConfigurationWriter(Service &service) : ConfigurationWriter(service, "template.conf")
-{
-}
-
-ConfigurationWriter::ConfigurationWriter(Service &service, std::string templateFileName) : service(service), templateFileName(templateFileName)
+ConfigurationWriter::ConfigurationWriter(Service &service) : service(service)
 {
 }
 
@@ -92,4 +69,61 @@ void ConfigurationWriter::replaceInLine(string &line, string original, string re
     {
         line.replace(position, string(original).length(), replacement);
     }
+}
+
+void ConfigurationWriter::readTemplate(vector<string> &lines)
+{
+    this->readFromFile("base-template.conf", lines);
+
+    if(this->service.acceptsHttp)
+    {
+        this->readFromFile("http-template.conf", lines);
+    }
+
+    if(this->service.acceptsHttps)
+    {
+        this->readFromFile("https-template.conf", lines);
+    }
+
+    if( ! this->service.acceptsHttp && this->service.acceptsHttps)
+    {
+        this->readFromFile("http-to-https-redirect-template.conf", lines);
+    }
+}
+
+void ConfigurationWriter::readFromFile(string fileName, vector<string> & lines) {
+    std::ifstream inputStream;
+    inputStream.open(fileName);
+
+    if(! inputStream.is_open())
+    {
+        throw FileOpenException(fileName);
+    }
+
+    string line;
+
+    while(getline(inputStream, line))
+    {
+        lines.emplace_back(line);
+    }
+
+    inputStream.close();
+}
+
+void ConfigurationWriter::writeToOutputFile(vector<string> & lines)
+{
+    std::ofstream outputStream;
+    outputStream.open(this->service.getConfigFileName());
+
+    if(! outputStream.is_open())
+    {
+        throw FileOpenException(this->service.getConfigFileName());
+    }
+
+    for(string &line : lines)
+    {
+        outputStream << line << std::endl;
+    }
+
+    outputStream.close();
 }
