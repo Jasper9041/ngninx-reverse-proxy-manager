@@ -17,12 +17,12 @@ class ConfigurationWriter
         void writeUpstreams(string & line);
         void replaceInLine(string & line, string original, string replacement);
         void readFromFile(string fileName, vector<string> & lines);
-        void writeToOutputFile(vector<string> & lines);
+        void writeToOutputFile(vector<string> & lines, string & path);
         void readTemplate(vector<string> & lines);
     public:
         ConfigurationWriter() = delete;
         ConfigurationWriter(Service &service);
-        void write();
+        void write(string & path);
 };
 
 

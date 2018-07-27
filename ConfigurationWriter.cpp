@@ -7,7 +7,7 @@
 
 using std::string;
 
-void ConfigurationWriter::write()
+void ConfigurationWriter::write(string & path)
 {
     vector<string> lines;
 
@@ -20,7 +20,7 @@ void ConfigurationWriter::write()
         this->writeUpstreams(line);
     }
 
-    this->writeToOutputFile(lines);
+    this->writeToOutputFile(lines, path);
 }
 
 ConfigurationWriter::ConfigurationWriter(Service &service) : service(service)
@@ -110,10 +110,10 @@ void ConfigurationWriter::readFromFile(string fileName, vector<string> & lines) 
     inputStream.close();
 }
 
-void ConfigurationWriter::writeToOutputFile(vector<string> & lines)
+void ConfigurationWriter::writeToOutputFile(vector<string> & lines, string & path)
 {
     std::ofstream outputStream;
-    outputStream.open(this->service.getConfigFileName());
+    outputStream.open(path.append(this->service.getConfigFileName()));
 
     if(! outputStream.is_open())
     {

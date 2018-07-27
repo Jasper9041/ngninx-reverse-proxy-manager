@@ -14,6 +14,10 @@ using namespace std;
 bool file_exists(string filename)
 {
     ifstream f(filename);
+    if(!f.is_open())
+    {
+        return false;
+    }
     return f.good();
 }
 
@@ -25,6 +29,12 @@ bool isStop(string & str)
 
 int main(int argc, char ** argv)
 {
+    string path = "/etc/nginx/conf.d/";
+    if(argc == 2)
+    {
+        path = string(argv[1]);
+    }
+
     string name;
     cout << "Enter service name: ";
     getline(cin, name);
@@ -70,18 +80,18 @@ int main(int argc, char ** argv)
             exit(0);
         }
 
-        cout << "Overwriting file!\n";
+        cout << "Overwriting file!";
     }
 
     try
     {
         ConfigurationWriter configurationWriter(service);
-        configurationWriter.write();
+        configurationWriter.write(path);
+
+        cout << "\nFile written!";
     }
     catch(FileOpenException & e)
     {
         cout << e.what();
     }
-
-    cout << "File written!";
 };
