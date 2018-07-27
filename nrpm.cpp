@@ -7,8 +7,15 @@
 
 #include <string>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
+
+bool file_exists(string filename)
+{
+    ifstream f(filename);
+    return f.good();
+}
 
 bool isStop(string & str)
 {
@@ -51,12 +58,25 @@ int main(int argc, char ** argv)
         getline(cin, portString);
     }
 
+    if(file_exists(service.getConfigFileName()))
+    {
+        cout << "File exists! Do you want to overwrite? (yes to overwrite)";
+        string answer;
+        getline(cin, answer);
+
+        if(answer.compare("yes") != 0)
+        {
+            cout << "Cancelling!";
+            exit(0);
+        }
+
+        cout << "Overwriting file!\n";
+    }
 
     try
     {
         ConfigurationWriter configurationWriter(service);
         configurationWriter.write();
-
     }
     catch(FileOpenException & e)
     {
